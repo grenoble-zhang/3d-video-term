@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Anchor Forcing: Leveraging Anchor Frames for Parallelized Long Video Generation.">
+  <meta name="keywords" content="Autoregressive Generation, Long-video Generatio, Parallelized Inference">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anchor Forcing: Leveraging Anchor Frames for Parallelized Long Video Generation</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Anchor Forcing: Leveraging Anchor Frames for Parallelized Long Video Generation</h1>
+          <div class="is-size-4 publication-authors">
+            <div class="author-row">
+              <span class="author-block" style="font-size: 28px;">
+              </span>
+            </div>
+            <div class="author-row">
+              <span class="author-block">
+                <a href="https://xbxsxp9.github.io/">Xunzhi Xiang</a><sup>*1,2</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=6aHx1rgAAAAJ&hl=zh-TW">Yabo Chen</a><sup>*2,3</sup>,</span>
+                <span class="author-block">
+                  <a href="https://scholar.google.com/citations?user=NLPMoeAAAAAJ&hl=en">Guiyu Zhang</a><sup>*2,4</sup>,</span>
+                <span class="author-block">
+                  Zhongyu Wang</a><sup>2</sup>,</span>
+                  <span class="author-block">
+                    Quanming Xiang<sup>5</sup>,</span>
+            </div>
+            <div class="author-row">
+              <span class="author-block">
+                Gonghu Shang</a><sup>2,3</sup>,</span>
+              <span class="author-block">
+              Junqi Liu</a><sup>2</sup>,</span>
+              <span class="author-block">
+                Haibin Huang</a><sup>2</sup>,</span>
+                <span class="author-block">
+                  Chi Zhang</a><sup>2</sup>,</span>
+                  <span class="author-block">
+                    Xuelong Li</a><sup>2</sup>,</span>
+                    <span class="author-block">
+                      <a href="https://fanq15.github.io/">Qi Fan</a><sup>1†</sup></span>
+            </div>
+          </div>
+
+          <div class="is-size-4 publication-authors">
+            <span class="author-block"><sup>1</sup>Nanjing University,</span>
+            <span class="author-block"><sup>2</sup>TeleAI, Shanghai,</span>
+            <span class="author-block"><sup>3</sup>Shanghai Jiao Tong University,</span>
+            <span class="author-block"><sup>4</sup>Chinese University of Hong Kong, Shenzhen,</span>
+            <span class="author-block"><sup>5</sup>University of Chinese Academy of Sciences</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="xxx"
+                   class="external-link button is-normal is-rounded is-dark"
+                   style="font-size: 18px; padding: 12px 24px;">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="xxx"
+                   class="external-link button is-normal is-rounded is-dark"
+                        style="font-size: 18px; padding: 12px 24px;">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+</section>
+
+<section class="section" style="padding-top: 0; margin-top: -5rem;">
+  <div class="container is-max-desktop">
+    <!-- Method. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" style="margin-bottom: 1rem; color: #4271DA;">TL;DR</h2>
+        
+        <!-- TL;DR Description -->
+        <div style="background: #f8fafc; border-left: 4px solid #4271DA; padding: 20px; margin: 20px 0; text-align: left; border-radius: 8px;">
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #374151;">
+            Our AF framework introduces sparse anchor frames as stable references to guide non-anchor frame generation. This design reduces error propagation frequency from per-frame to per-anchor granularity, enabling feasible long-sequence generation while significantly suppressing temporal artifacts.
+            <!-- <strong>Self Forcing</strong> trains autoregressive video diffusion models by <strong>simulating the inference process during training</strong>, performing autoregressive rollout with KV caching. It resolves the train-test distribution mismatch and enables <strong>real-time, streaming video generation on a single RTX 4090</strong> while matching the quality of state-of-the-art diffusion models. -->
+          </p>
+        </div>
+        
+        <!-- Main Framework Image -->
+        <img src="static/assets/compare2_01.png" alt="Self Forcing Framework" style="width: 100%; max-width: 100%; height: auto; margin: 20px 0;">
+        
+      </div>
+    </div>
+    <!--/ Method. -->
+</section>
+
+
+
+<section class="section" style="padding-top: 0; margin-top: -3rem;">
+  <div class="container" style="max-width: 100%; padding: 0 20px;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column" style="max-width: 100%;">
+        <h2 class="title is-3" style="margin-bottom: 1rem; color: #374151;">Real-Time Video Generation</h2>
+        
+        <!-- Description -->
+        <div class="content has-text-justified" style="font-size: 16px; margin-bottom: 2rem; color: #6b7280; max-width: 1200px; margin-left: auto; margin-right: auto;">
+          <p>
+            Our model generates high-quality 480P videos with an initial latency of <strong>~0.8 seconds</strong>, after which frames are generated
+            in a streaming fashion at <strong>~16 FPS</strong> on a single H100 GPU and <strong>~10 FPS</strong> on a single 4090 with some optimizations.
+            Below, we show 5-second videos (top) and extrapolated 10-second videos (bottom) generated by our model. 
+            <a href="#" style="color: #6366f1; text-decoration: none;">[More Examples]</a>
+          </p>
+        </div>
+        
+        <div class="video-grid">
+          <!-- Video 1 -->
+          <div class="video-container">
+              <video muted loop autoplay controls>
+                  <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+                  Your browser does not support the video tag.
+              </video>
+              <div class="video-overlay">
+                  <p>
+                      A dynamic and chaotic scene in a dense forest during a heavy rainstorm, capturing a real girl frantically running through the foliage. Her wild hair flows behind her as she sprints, her arms flailing and her face contorted in fear and desperation.
+                  </p>
+              </div>
+          </div>
+
+          <!-- Video 2 -->
+          <div class="video-container">
+            <video muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-overlay">
+              <p>
+                A serene mountain landscape at sunrise with golden light casting long shadows across snow-capped peaks. Eagles soar majestically through the crisp morning air while mist rises from the valleys below, creating a breathtaking panoramic view.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Video 3 -->
+          <div class="video-container">
+            <video muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-overlay">
+              <p>
+                An underwater coral reef ecosystem teeming with vibrant tropical fish. Schools of colorful fish swim in synchronized patterns while sea turtles glide gracefully through crystal-clear waters illuminated by filtered sunlight.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Video 4 -->
+          <div class="video-container">
+            <video muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-overlay">
+              <p>
+                A bustling night market in an Asian city with neon signs reflecting on wet streets. People move through narrow alleys lined with food stalls, creating a vibrant atmosphere of urban life and cultural richness.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Video 5 -->
+          <div class="video-container">
+            <video muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-overlay">
+              <p>
+                A peaceful meadow at dawn with morning dew glistening on wildflowers. Butterflies dance among the blooms while soft golden light creates a dreamy, ethereal atmosphere across the tranquil landscape.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Video 6 -->
+          <div class="video-container">
+            <video muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-overlay">
+              <p>
+                A time-lapse of city lights creating colorful trails as traffic flows through urban streets at night. The dynamic movement captures the pulse and energy of metropolitan life in a mesmerizing display of light and motion.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" style="padding: 4rem 0;">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column" style="max-width: 100%;">
+        <!-- Title -->
+        <h2 class="title is-3" style="margin-bottom: 2rem; color: #374151; font-weight: 600;">
+          (Surprisingly) Efficient Training, Even Without Full Parallelism
+        </h2>
+        
+        <!-- Description -->
+        <div class="content has-text-justified" style="font-size: 16px; margin-bottom: 3rem; color: #6b7280; max-width: 900px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+          <p>
+            While Self Forcing relies on sequential rollout, it is surprisingly efficient and obtains better quality with the same 
+            training budget. This is mainly because we still maintain sufficient parallelism even processing one frame at a time.
+          </p>
+        </div>
+        
+        <!-- Charts Container -->
+        <div class="charts-container" style="display: flex; justify-content: center; align-items: center; margin-top: 2rem;">
+          <div class="chart-image" style="width: 100%; max-width: 1000px; text-align: center;">
+            <img src="static/assets/image.png" 
+                 alt="Training efficiency comparison charts showing per-iteration training time and quality vs training time" 
+                 style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); background: white; padding: 20px;">
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<section class="section" style="padding: 4rem 0;">
+  <div class="container" style="max-width: 100%; margin: 0 auto; padding: 0;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column" style="max-width: 100%;">
+        <!-- Title -->
+        <div style="padding: 0 20px;">
+          <h2 class="title is-3" style="margin-bottom: 2rem; color: #374151; font-weight: 600;">
+            Faster and Better
+          </h2>
+          
+          <!-- Description -->
+          <div class="content has-text-justified" style="font-size: 16px; margin-bottom: 3rem; color: #6b7280; max-width: 1000px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+            <p>
+              Our method has the same speed as CausVid but has much better video quality, free from over-saturation artifacts and 
+              having more natural motion. Compared to Wan, SkyReels, and MAGI, our approach is <strong>150-400x faster</strong> in terms of 
+              latency, while achieving comparable or superior visual quality.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Comparison Grid - Full Width -->
+        <div class="comparison-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 2rem; padding: 0 8px;">
+          
+          <!-- Column Headers -->
+          <div class="comparison-header" style="padding: 15px 10px; font-weight: 600; color: #374151; display: flex; align-items: center; justify-content: center; min-height: 60px;">
+            Wan2.1-1.3B
+          </div>
+          <div class="comparison-header" style="padding: 15px 10px; font-weight: 600; color: #374151; display: flex; align-items: center; justify-content: center; min-height: 60px;">
+            SkyReels2-1.3B
+          </div>
+          <div class="comparison-header" style="padding: 15px 10px; font-weight: 600; color: #374151; display: flex; align-items: center; justify-content: center; min-height: 60px;">
+            MAGI-1-4.5B
+          </div>
+          <div class="comparison-header" style="padding: 15px 10px; font-weight: 600; color: #374151; display: flex; align-items: center; justify-content: center; min-height: 60px;">
+            CausVid-1.3B
+          </div>
+          <div class="comparison-header" style="padding: 15px 10px; font-weight: 600; color: #2d5a2d; display: flex; align-items: center; justify-content: center; min-height: 60px;">
+            Ours-1.3B
+          </div>
+          
+          <!-- Row 1 - City Scene -->
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; border: 3px solid #22c55e;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          
+          <!-- Row 2 - Plant Scene -->
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; border: 3px solid #22c55e;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          
+          <!-- Row 3 - Character Scene -->
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="comparison-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover; border: 3px solid #22c55e;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<section class="section" style="padding: 4rem 0;">
+  <div class="container" style="max-width: 100%; margin: 0 auto; padding: 0;">
+    <div class="columns is-centered has-text-centered">
+      <div class="column" style="max-width: 100%;">
+        <!-- Title -->
+        <div style="padding: 0 20px;">
+          <h2 class="title is-3" style="margin-bottom: 2rem; color: #374151; font-weight: 600;">
+            Limitation: Extrapolation Quality
+          </h2>
+          
+          <!-- Description -->
+          <div class="content has-text-justified" style="font-size: 16px; margin-bottom: 3rem; color: #6b7280; max-width: 1000px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+            <p>
+              While Self Forcing addresses exposure bias and we observe no error accumulation within the video length the model is 
+              trained on (5 seconds), we still observe quality degradation when extrapolating beyond its training horizon. Below we 
+              show 30-second videos generated via sliding window extrapolation.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Video Grid - Full Width -->
+        <div class="limitation-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 2rem; padding: 0 8px;">
+          
+          <!-- Video 1 -->
+          <div class="limitation-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-caption" style="margin-top: 1px; padding: 0 4px; font-size: 13px; line-height: 1.4; color: #6b7280; text-align: center;">
+              The close-up shot of a Victoria crowned pigeon showcases its striking blue plumage and red chest...
+            </div>
+          </div>
+          
+          <!-- Video 2 -->
+          <div class="limitation-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-caption" style="margin-top: 1px; padding: 0 4px; font-size: 13px; line-height: 1.4; color: #6b7280; text-align: center;">
+              A cartoon kangaroo disco dances.
+            </div>
+          </div>
+          
+          <!-- Video 3 -->
+          <div class="limitation-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-caption" style="margin-top: 1px; padding: 0 4px; font-size: 13px; line-height: 1.4; color: #6b7280; text-align: center;">
+              A Chinese Lunar New Year celebration video with Chinese Dragon.
+            </div>
+          </div>
+          
+          <!-- Video 4 -->
+          <div class="limitation-video">
+            <video style="width: 100%; height: auto; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;" muted loop autoplay controls>
+              <source src="static/assets/visual_results/0000.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-caption" style="margin-top: 1px; padding: 0 4px; font-size: 13px; line-height: 1.4; color: #6b7280; text-align: center;">
+              3D animation of a small, round, fluffy creature with big, expressive eyes explores a vibrant, enchanted forest...
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Responsive design for limitation grid */
+@media (max-width: 1200px) {
+    .limitation-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+    
+    .video-caption {
+        font-size: 14px !important;
+        margin-top: 10px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .limitation-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+        padding: 0 12px !important;
+    }
+    
+    .video-caption {
+        font-size: 15px !important;
+        margin-top: 12px !important;
+        padding: 0 8px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .limitation-grid {
+        padding: 0 16px !important;
+    }
+    
+    .video-caption {
+        padding: 0 12px !important;
+    }
+}
+</style>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>
+@article{zhang2025proteus,
+  title={Proteus-ID: ID-Consistent and Motion-Coherent Video Customization},
+  author={Zhang, Guiyu and Shi, Chen and Jiang, Zijian and Xiang, Xunzhi and Qian, Jingjing and Shi, Shaoshuai and Jiang, Li},
+  journal={arXiv preprint arXiv:2506.23729},
+  year={2025}
+}
+</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website template is borrowed from <a
+                href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>. Thanks for their effort.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
