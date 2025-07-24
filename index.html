@@ -140,11 +140,14 @@
     color: #6b7280;
     margin-top: 0.5rem;
   }
+  .section-divider {
+    border-top: 1px solid #d1d5db;
+    margin: 3rem 0 2rem;
+  }
 </style>
 
 <section class="section" style="padding-top: 0; margin-top: -5rem;">
   <div class="container is-max-desktop">
-    <!-- Section Title -->
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
         <h2 class="title is-3 section-title">TL;DR</h2>
@@ -156,12 +159,15 @@
           </p>
         </div>
 
-        <!-- Framework Overview Image -->
+        <!-- Framework Overview -->
         <h3 class="title is-4 has-text-left">Anchor Forcing Framework</h3>
         <img src="static/assets/compare2_01.png" alt="Anchor Forcing Overview" style="width: 100%; height: auto; margin: 20px 0;">
         <p class="figure-caption">Overview of anchor-based generation and reduced error propagation frequency from per-frame to per-anchor level.</p>
 
-        <!-- Parallel Inference Image -->
+        <!-- 🔽 灰色横线 Divider 插入处 -->
+        <div class="section-divider"></div>
+
+        <!-- Parallel Inference -->
         <h3 class="title is-4 has-text-left">Pipelined Parallel Generation for Long Videos</h3>
         <img src="static/assets/Anchor_Forcing_P.png" alt="Pipelined Parallel Generation for Long Videos" style="width: 100%; height: auto; margin: 20px 0;">
         <p class="figure-caption">Parallel prediction enabled by forecasting future anchor frames across multiple GPUs.</p>
@@ -169,6 +175,7 @@
     </div>
   </div>
 </section>
+
 
 
 
